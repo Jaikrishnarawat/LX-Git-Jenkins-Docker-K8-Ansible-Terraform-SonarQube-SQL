@@ -24,3 +24,94 @@ LVM:- Logical Volume Manager provides flixible disk management.
 Runlevel:- It define machine states.
 Socket:- It is an endpoint for communication between two process on ssame machine.
 
+Commands:-
+ls	List directory contents
+cd	Change directory
+pwd	Print working directory
+mkdir	Make a directory
+rm	Remove files/folders
+cp	Copy files
+mv	Move or rename
+cat	Display file content
+tail	View the end of a file
+grep	Search for text
+vim / nano	Text editors
+find	Search for files
+diff	Compare two files
+chmod	Change permissions	
+chown	Change owner/group
+sudo	Run as root/admin	
+top / htop	Real-time process list	
+ps	Snapshot of processes	
+kill	Stop a process	
+df -h	Disk space usage	
+free -m	Memory usage	
+curl	Transfer data/API calls	
+ssh	Remote login	
+netstat / ss	Check open ports	
+ip addr	View IP addresses	
+ping	Test connectivity	
+apt / yum	Install software	
+systemctl	Manage services
+journalctl	View service logs	
+traceroute: Lists every "hop" (router) a packet takes to reach a destination. Example: traceroute google.com
+tracepath: Similar to traceroute but doesn't require root privileges and tracks MTU (Maximum Transmission Unit). Example: tracepath 1.1.1.1
+netstat: Displays network connections, routing tables, and interface statistics. Example: netstat -tulpn (Shows listening ports and PIDs)
+ipconfig / ifconfig: Displays or configures network interface parameters (Note: ip addr is the modern Linux replacement). Example: ip addr show
+mtr: A real-time combination of ping and traceroute. Example: mtr google.com
+curl: Transfers data to or from a server via supported protocols (HTTP, FTP, etc.). Example: curl -X POST https://api.site.com/data
+wget: Non-interactive network downloader for files and entire websites. Example: wget https://wordpress.org/latest.tar.gz
+watch: Runs a command repeatedly at a set interval (default 2s) to track changes. Example: watch -n 1 "df -h" (Watch disk space every second)
+GREP: Searches for a specific pattern/string within text. Example: grep "ERROR" system.log
+SED: Stream Editor used for searching, replacing, or deleting text in a file. Example: sed -i 's/localhost/127.0.0.1/g' app.conf (Find and replace)
+AWK: A scripting language for processing data in columns/rows. Example: awk '{print $1, $3}' file.txt (Prints only the 1st and 3rd columns)
+
+Interview Question Answer
+. Beginner Level (The Fundamentals)
+Q: What is the "Kernel" and what is its role?
+A: The Kernel is the core of the OS. It acts as a bridge between hardware and software, managing CPU, memory, and device drivers.
+Q: What is the difference between a Hard Link and a Soft Link?
+A: A Hard Link is a direct pointer to the file's data (inode); if you delete the original file, the data stays. A Soft Link (Symbolic) is just a shortcut to the file path; if the original is deleted, the link breaks.
+Q: How do you change permissions so only the owner can read/write a file?
+A: chmod 600 filename.
+Q: What does the top command show?
+A: It provides a dynamic, real-time view of running processes, CPU usage, and memory consumption.
+2. Intermediate Level (System Admin & Troubleshooting)
+Q: What are Inodes in Linux?
+A: An Inode is a data structure that stores metadata about a file (size, owner, permissions, location on disk), but not the filename or the actual data.
+Q: How do you find which process is using a specific port (e.g., 8080)?
+A: lsof -i :8080 or netstat -tulnp | grep 8080.
+Q: Explain the Linux Boot Process.
+A: 1. BIOS/UEFI (Hardware check)
+2. GRUB/Bootloader (Loads Kernel)
+3. Kernel (Initializes hardware)
+4. Systemd/Init (Starts services/processes).
+Q: What is a "Zombie Process" and how do you kill it?
+A: A process that has finished execution but still has an entry in the process table because the parent hasn't "reaped" it. You cannot kill -9 a zombie; you must kill the parent process or wait for it to be adopted by init.
+3. Advanced Level (Architecture & Performance)
+Q: What is eBPF and why is it useful?
+A: It’s a technology that allows running sandboxed programs in the kernel without changing kernel source code. It’s used for high-performance networking, security, and deep observability.
+Q: How does Linux handle "Thrashing"?
+A: Thrashing occurs when the system spends more time swapping data between RAM and Disk (Swap) than actually executing code. The solution is usually to add RAM or use the OOM Killer to terminate memory-heavy processes.
+Q: Explain the concept of "Load Average" (the 3 numbers in uptime).
+A: They represent the average system load over the last 1, 5, and 15 minutes. It counts processes that are either using the CPU or waiting for it (runnable state).
+4. Scenario-Based Questions (The "Real World")
+Scenario A: The "Invisible" Disk Space
+Interviewer: "A developer says their disk is 100% full (df -h). They deleted a 50GB log file, but df -h still says the disk is full. Why?"
+Answer: A process still has that file open. Linux doesn't actually free the disk blocks until all file descriptors are closed.
+Fix: Run lsof | grep deleted to find the process holding the file, then restart that process or truncate the file.
+Scenario B: The "Server is Slow"
+Interviewer: "The server is responding slowly. You run top and see low CPU usage but high 'iowait' (%wa). What is the problem?"
+Answer: High iowait means the CPU is sitting idle because it’s waiting for the Disk/Storage to respond.
+Fix: Use iostat or iotop to find the process doing heavy disk writing/reading, or check if the underlying disk (EBS/SAN) is failing.
+Scenario C: Connection Timed Out
+Interviewer: "App A cannot talk to App B on Port 5432. How do you troubleshoot?"
+Answer:
+Check if App B is listening: ss -tulpn | grep 5432.
+Check local firewall: iptables -L or ufw status.
+Test connectivity from App A: nc -zv <IP> 5432.
+Check if a Cloud Security Group or Network ACL is blocking it.
+Scenario D: Permission Denied for Root
+Interviewer: "You are the root user and you get 'Permission Denied' when trying to modify a file. How is this possible?"
+Answer: The file likely has the Immutable Attribute set.
+Fix: Run lsattr filename to check. If you see an i, run chattr -i filename to remove the protection.
