@@ -1,0 +1,26 @@
+Linxu Kernel:- A kernel is the core software of an operating system that acts as a bridge between the computer's hardware and the applications you run.
+Since Linux is Monolithic, it is highly efficient, which is why it dominates the cloud. However, because everything runs in one space, tools like eBPF (which we discussed earlier) were created to let us safely plug into that massive "all-in-one" engine without risking a total system crash.
+Responsibility of linux kernel:- The Linux kernel acts as the "middleman" between your software and your hardware. Its primary responsibility is to manage system resources efficiently and securely.
+Process  Responsibility, Memory Responsibility, Device Management, File System Management.
+System Libraries:- It provides basic functionality son application do not need to communicate directly with the kernel. 
+System Utilities:- These are essential program that help in system functioning.
+Shell:- Ther shell is  he interface between user and OS.
+Linux Distribution (Distor):- Linux kernel + packaged software = Linux Distors.
+Linux:- It provide an enviorment where user can run application, manage files, control hardware, and perform system tasks.
+Process:- It is running instance of a program. 
+Different type of Process:- Foreground, background, Daemon, Zombie, Orphan.
+Linux File Permission:- 
+chmod: Change the permissions (e.g., chmod +x file makes it executable).
+chown: Change the owner or group (e.g., chown root:root file).
+umask: Sets the default permissions for newly created files.
+Packaage Manager:-  It is a tool to install update, remove manage software in liunx.
+Process state in Linux:- Ready, Running, Waiting, Stopped, Zombie.
+Zombie  Process:- Process has completed execution still present in the process table.
+Orphan Process:- Parent has terminated child is still running.
+Linux  handle memory mmanagement:- paging, virtual memory, swapping, cache, memory protection, OOM Killer.
+Inodes:- An inodes store metadate about a file.
+Cntext Switch:- It happen when the CPU Switch from one procees to another.
+LVM:- Logical Volume Manager provides flixible disk management.
+Runlevel:- It define machine states.
+Socket:- It is an endpoint for communication between two process on ssame machine.
+
