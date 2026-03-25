@@ -115,3 +115,13 @@ Scenario D: Permission Denied for Root
 Interviewer: "You are the root user and you get 'Permission Denied' when trying to modify a file. How is this possible?"
 Answer: The file likely has the Immutable Attribute set.
 Fix: Run lsattr filename to check. If you see an i, run chattr -i filename to remove the protection.
+
+
+Port Number 
+FTP - 21
+SSH - 22
+TELNET - 23
+SMTP - 25
+DNS - 53
+HTTP - 80 
+HTTPS - 443
