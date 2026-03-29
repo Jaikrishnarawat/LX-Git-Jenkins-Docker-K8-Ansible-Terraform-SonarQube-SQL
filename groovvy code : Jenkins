@@ -131,3 +131,73 @@ def call() {
     deleteDir() // Deletes the current workspace
     sh "docker image prune -f --filter 'until=24h'" // Deletes old dangling images
 }
+
+
+####groovy code
+
+Create docker_cleanup.groovy
+def call(String GitUrl, String GitBranch){
+  git url: "${GitUrl}", branch: "${GitBranch}"
+}
+
+
+Update docker_build.groovy
+// Define function
+def call(String ProjectName, String ImageTag, String DockerHubUser){
+  sh "docker build -t ${DockerHubUser}/${ProjectName}:${ImageTag} ."
+}
+
+
+
+Create docker_cleanup.groovy
+def call(String Project, String ImageTag, String DockerHubUser){
+  sh "docker rmi ${DockerHubUser}/${Project}:${ImageTag}"
+}
+
+
+Create docker_compose.groovy
+def call(){
+  sh "docker-compose down && docker-compose up -d"
+}
+
+Update docker_push.groovy
+def call(String Project, String ImageTag, String dockerhubuser){
+  withCredentials([usernamePassword(credentialsId: 'docker', passwordVariable: 'dockerhubpass', usernameVariable: 'dockerhubuser')]) {
+      sh "docker login -u ${dockerhubuser} -p ${dockerhubpass}"
+  }
+  sh "docker push ${dockerhubuser}/${Project}:${ImageTag}"
+}
+
+
+Update sonarqube_analysis.groovy
+def call(String SonarQubeAPI, String Projectname, String ProjectKey){
+  withSonarQubeEnv("${SonarQubeAPI}"){
+      sh "$SONAR_HOME/bin/sonar-scanner -Dsonar.projectName=${Projectname} -Dsonar.projectKey=${ProjectKey} -X"
+  }
+}
+
+
+Create sonarqube_code_quality.groovy
+def call(){
+  timeout(time: 1, unit: "MINUTES"){
+      waitForQualityGate abortPipeline: false
+  }
+}
+
+
+Update trivy_scan.groovy
+def call(){
+  sh "trivy fs ."
+}
+
+
+
+\\\\\\\\\\ if we just want to use any above groovy code in jenkins file, so syntax will be as followed\\\\\\\\\\\\\\\
+
+stage ("Sonarcube =  code quality test") {
+step{
+script{
+sonarqube_code_quality()
+}
+}
+}
