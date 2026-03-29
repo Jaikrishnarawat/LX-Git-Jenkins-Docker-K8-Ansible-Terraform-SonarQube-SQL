@@ -1,5 +1,5 @@
 Jenkins files are used in Jenkins to automate the process like tes, build, deploy etc.
-
+####In Jenkins, a Shared Library is a version-controlled collection of Groovy scripts that allow you to reuse code, scripts, and common functionality across multiple pipelines
 @Library('Shared')_
 pipeline{
     agent { label 'dev-server'}
