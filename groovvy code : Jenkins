@@ -1,0 +1,131 @@
+Jenkins files are used in Jenkins to automate the process like tes, build, deploy etc.
+
+@Library('Shared')_
+pipeline{
+    agent { label 'dev-server'}
+
+    stages{
+        stage("Code clone"){
+            steps{
+                sh "whoami"
+            clone("https://github.com/---------------------","main")
+            }
+        }
+        stage("Code Build"){
+            steps{
+            dockerbuild("notes-app","latest")
+            }
+        }
+        stage("Push to DockerHub"){
+            steps{
+                dockerpush("dockerHubCreds","notes-app","latest")
+            }
+        }
+        stage("Deploy"){
+            steps{
+                deploy()
+            }
+        }
+
+    }
+}
+
+
+we also do credential binding (no one can see the password )
+
+
+
+
+
+/////////if we want to run parallel command in jenkins, so syntax will be //////
+
+pipeline {
+    agent any
+    stages {
+        stage('Run Parallel Branches') {
+            parallel {
+                stage('Branch A') {
+                    steps {
+                        echo 'This is branch A'
+                        sh 'sleep 5' // Example command
+                    }
+                }
+                stage('Branch B') {
+                    steps {
+                        echo 'This is branch B'
+                        sh 'ls -l' // Example command
+                    }
+                }
+                stage('Branch C') {
+                    steps {
+                        echo 'This is branch C'
+                        sh 'pwd' // Example command
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+##### groovvy code which can be use in jenkins
+
+1. Standardized Slack Notification (vars/sendSlack.groovy)
+Instead of writing complex JSON for every build, use this to send consistent alerts.
+groovy
+// vars/sendSlack.groovy
+def call(String buildStatus) {
+    def color = (buildStatus == 'SUCCESS') ? 'good' : 'danger'
+    def message = "${buildStatus}: Job '${env.JOB_NAME}' [build #${env.BUILD_NUMBER}] (${env.BUILD_URL})"
+    
+    slackSend(color: color, message: message)
+}
+Use code with caution.
+
+How to use it in your Jenkinsfile:
+groovy
+post {
+    always {
+        sendSlack(currentBuild.currentResult)
+    }
+}
+Use code with caution.
+
+2. Docker Build & Push (vars/dockerBuild.groovy)
+This script automates tagging your images with the build number and pushing them to a registry (like Docker Hub or ACR).
+groovy
+// vars/dockerBuild.groovy
+def call(Map config = [:]) {
+    def imageName = config.imageName
+    def registry = config.registry ?: "my-default-registry.com"
+    def tag = "${env.BUILD_NUMBER}"
+
+    echo "Building image: ${imageName}:${tag}"
+    
+    sh "docker build -t ${registry}/${imageName}:${tag} ."
+    
+    withCredentials([usernamePassword(credentialsId: 'docker-creds', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
+        sh "echo $PASS | docker login ${registry} -u $USER --password-stdin"
+        sh "docker push ${registry}/${imageName}:${tag}"
+    }
+}
+Use code with caution.
+
+How to use it in your Jenkinsfile:
+groovy
+stage('Build Image') {
+    steps {
+        dockerBuild(imageName: 'my-app', registry: 'myrepo.azurecr.io')
+    }
+}
+Use code with caution.
+
+3. Cleanup Workspace (vars/cleanEnv.groovy)
+A helper to ensure your build agent stays clean, avoiding "disk full" errors.
+groovy
+// vars/cleanEnv.groovy
+def call() {
+    echo "Cleaning up workspace and old Docker images..."
+    deleteDir() // Deletes the current workspace
+    sh "docker image prune -f --filter 'until=24h'" // Deletes old dangling images
+}
