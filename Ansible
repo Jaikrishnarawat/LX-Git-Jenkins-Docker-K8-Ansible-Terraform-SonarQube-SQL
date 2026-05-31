@@ -1,1 +1,104 @@
-here 
+Syntax
+---  (start of Ansible YAML file)
+hosts: server-group    -----------------> which server this playbook run for 
+become: yes    ---------------------------> use sudo / root privilege  
+tasks:
+   -name: task descrption
+    module_name:
+    parameter1: value
+    parameter2: value 
+
+some point which need to know about ansible ----
+inventory playbook -- define target server
+playbooks-- core automation file written in yamal
+module-- ansible works using module
+variable-- makes variable reusable
+handler-- used for restarting services only when change occur
+role-- role organise large playbook (Imp)  
+template-- used for dynamic configuration file
+Ansible vault-- encryption password and secrets
+ad hoc command-- quick one line command
+Idempotency-- ansible avoid repeating same word unnecessarily (Imp)
+
+example 1:- install and start nginx in webserver
+---
+hosts: webserver
+become: yes
+tasks:
+  -name: install nginx
+   apt:
+   name: nginx
+   state: present
+  -name: start nginx
+   service:
+   name: nginx
+   state: present
+
+
+example 2:- install, copy and start java application on appserver
+---
+hosts: appserver
+become: yes
+tasks:
+  -name: install  java 
+   apt:
+   name: openjdk-17.jdk
+   state: present 
+  -name: copy jar files
+   copy:
+   src: app.jar
+   des: /apt/app.jar
+  -name:  start java application
+  shell: java-jar/apt/app.jar
+
+
+example 3 with Role and idempotency 
+install java, install docker, install nginx, copy nginx file, deploy and run the java application on appserver
+---
+hosts: appserver
+become: yes
+roles:
+       -java
+          tasks:
+            -name: install  java
+            apt:
+            name: openjdk-17.jdk
+            state: present
+            update_cache: yes
+       -docker
+          tasks:
+            -name: install docker
+            apt:
+            name: docker.io
+            state: present
+            -name: docker service
+            service:
+            name: docker
+            state: started
+            enable: yes
+       -nginx
+          tasks:
+            -name: install nginx
+            apt:
+            name: nginx
+            state: present 
+       -deploy app
+          tasks:
+            -name: create app directory 
+            file:
+            path: /apt/java.app
+            state: directory 
+            -name: copy docker compose file 
+            copy:
+            src: __________
+            dec: ____________
+            -name: run application container
+            shell: docker compose up -d 
+            args: 
+            chdir: /apt/java.app
+
+
+
+
+
+
