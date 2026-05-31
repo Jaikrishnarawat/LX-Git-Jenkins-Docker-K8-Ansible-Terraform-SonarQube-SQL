@@ -2,9 +2,9 @@ It is Infrastructure provisioning (creating) tool. extention will be .tf
 
 teraform syntax :-
 
-block  parameter_type  parameters_name {
-
-       arguments 
+block  resource_type  resource_name {
+property1 : "value"
+property2 : "value"   
 
 }
 
@@ -48,3 +48,40 @@ tag {
 Name = "web-server-${count.index}"
 }
 }
+
+
+# Create an isolated VPC network space
+resource "aws_vpc" "devops_vpc" {
+  cidr_block           = "10.0.0.0/16"
+  enable_dns_hostnames = true
+
+  tags = {
+    Name        = "devops-project-vpc"
+    Environment = "Development"
+  }
+}
+
+
+# Create a public subnet for hosting web/app servers
+resource "aws_subnet" "public_subnet" {
+  vpc_id                  = aws_vpc.devops_vpc.id
+  cidr_block              = "10.0.1.0/24"
+  map_public_ip_on_launch = true
+  availability_zone       = "us-east-1a"
+
+  tags = {
+    Name = "devops-public-subnet"
+  }
+}
+
+
+# Attach an Internet Gateway to allow external traffic flow
+resource "aws_internet_gateway" "igw" {
+  vpc_id = aws_vpc.devops_vpc.id
+
+  tags = {
+    Name = "devops-vpc-igw"
+  }
+}
+
+tag are not compulsory to use.
