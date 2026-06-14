@@ -1,0 +1,54 @@
+Docker file are like:
+Example: Python application docker file 
+FROM python:3.9-slim
+WORKDIR /app
+COPY ..
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+CMD ["python", "app.py"]
+
+
+Example:///////////# Docker file for java image ////////////
+$FROM openjdk :17-jdk-alpine
+#create the folder where the app cpde will be store 
+$WORKDIR /App
+#copy the source code from your host machine to your container
+$COPY src/main.java  /App/main.java 
+#compile the application code
+$RUN  javac main.java
+#run the application 
+CMD ["java","main"]
+
+
+Example: //////////# Docker file for node image///////////
+$FROM node: 12.2.0-alpine
+$WORKDIR /node
+$COPY..
+$RUN npm install
+$RUN npm run test
+$CMD ["node","app.js"]
+
+if we talk about multi staging docker files:
+/////// use to compress the size of the docker file //////
+stage 1:- when base image is 995mb - docker file will be about to 1.04 gb
+$FROM Python:3.7 AS builder
+$WORKDIR /app
+$Copy requirement.txt
+$RUN pip install -r requirment.txt
+
+Stage 2:- Final stage base image will be 102 mb just bcoz of we use slim image insted of using python full image docker file will be about to 128 mb
+
+$FROM Python:3.7 slim 
+$WORKDIR /app
+$Copy -from=builder ((location of requirements.txt file installed) /use/local/lib/pyhton3.7/site-package/  /use/local/lib/pyhton3.7/site-package)
+$Copy ..
+ENTRYPOINT ["python","run.py"]
+
+
+
+when you want to hide the back end server detail from the client this is called the reverse  proxy
+CMD provide default command that can be override when starting a container
+entry point define a main command that always runs when the container starts
+docker image is a blueprint for creating container
+dockerfile is instruction to build image
+
