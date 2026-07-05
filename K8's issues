@@ -1,0 +1,286 @@
+1. Pod is in Pending State ⭐⭐⭐⭐⭐
+Interviewer:
+
+"A Pod is stuck in Pending state. What will you do?"
+
+Possible Causes
+Insufficient CPU/Memory
+No available nodes
+PVC not bound
+Taints and tolerations mismatch
+Node selector/affinity mismatch
+
+Commands
+kubectl get pods
+kubectl describe pod <pod-name>
+kubectl get nodes
+kubectl describe node <node-name>
+Sample Answer
+
+First, I check the pod status using kubectl get pods. Then I run kubectl describe pod to see the Events section. Usually, it tells me if the pod couldn't be scheduled due to insufficient resources, node affinity, or storage issues. Based on the reason, I either free resources, scale the cluster, or fix the scheduling configuration.
+
+2. Pod is in CrashLoopBackOff ⭐⭐⭐⭐⭐
+Interviewer:
+
+"Your Pod is restarting continuously. How do you troubleshoot?"
+
+Causes
+Application crash
+Wrong environment variables
+Database connection failure
+Missing Secret
+Wrong startup command
+
+Commands
+kubectl logs <pod-name>
+kubectl logs <pod-name> --previous
+kubectl describe pod <pod-name>
+
+Sample Answer
+I first check the container logs to identify why the application is crashing. Then I verify environment variables, ConfigMaps, Secrets, and database connectivity. If necessary, I inspect the deployment YAML for incorrect commands or image configurations.
+
+3. ImagePullBackOff ⭐⭐⭐⭐⭐
+Interviewer:
+
+"Your image is not downloading."
+
+Causes
+Wrong image tag
+Wrong image name
+Private registry authentication failure
+Image doesn't exist
+
+Check
+kubectl describe pod
+
+Look for
+Failed to pull image
+
+
+4. Node is NotReady ⭐⭐⭐⭐
+Interviewer:
+
+"One worker node becomes NotReady. What happens?"
+
+Answer
+Scheduler stops scheduling new Pods on that node.
+Existing Pods may become unavailable.
+Kubernetes recreates Pods on healthy nodes (depending on the controller and timing).
+Investigate the node's kubelet, network, disk, or cloud instance health.
+
+Commands
+kubectl get nodes
+kubectl describe node
+
+5. Service is Not Accessible ⭐⭐⭐⭐⭐
+Interviewer
+"Pods are running but the application is not accessible."
+
+Check
+kubectl get svc
+kubectl describe svc
+
+Verify
+Selector labels
+TargetPort
+Port
+Endpoints
+
+Example
+Pod
+
+labels:
+ app: backend
+
+Service
+
+selector:
+ app: frontend
+
+No matching Pods.
+
+6. Deployment Failed After New Release ⭐⭐⭐⭐⭐
+Interviewer
+
+"Deployment failed after releasing a new version."
+
+Answer
+
+Check rollout
+kubectl rollout status deployment myapp
+
+Rollback
+kubectl rollout undo deployment myapp
+
+Mention that rolling updates minimize downtime and allow quick rollback if the new version is unhealthy.
+
+7. ConfigMap/Secret Issue ⭐⭐⭐⭐
+Interviewer
+
+"Application is not starting after configuration changes."
+
+Possible issue
+Secret Missing
+ConfigMap Missing
+Error
+CreateContainerConfigError
+
+Check
+kubectl describe pod
+
+8. OOMKilled ⭐⭐⭐⭐
+Interviewer
+"Container gets killed automatically."
+
+Reason
+Memory exceeded.
+limits:
+ memory: 512Mi
+
+Application uses
+900Mi
+Status
+OOMKilled
+
+Fix
+
+Increase memory limits.
+Optimize the application.
+Set appropriate resource requests and limits.
+
+
+9. Readiness Probe Failure ⭐⭐⭐⭐
+Interviewer
+"Application is running but users can't access it."
+
+Reason
+Readiness Probe Failed
+Container is running.
+Application isn't ready.
+Traffic won't reach that Pod until the readiness probe succeeds.
+
+10. Liveness Probe Failure ⭐⭐⭐⭐
+Interviewer
+"Container keeps restarting automatically."
+
+Reason
+Liveness probe fails.
+Kubernetes assumes the application is unhealthy and restarts the container.
+
+11. Persistent Volume Issue ⭐⭐⭐⭐
+Interviewer
+"Database Pod is Pending."
+
+Reason
+PVC not bound.
+
+Commands
+kubectl get pvc
+kubectl describe pvc
+
+12. DNS Resolution Failure ⭐⭐⭐
+Interviewer
+"Frontend cannot communicate with Backend."
+
+Check
+nslookup backend-service
+kubectl exec -it pod -- sh
+
+Also verify:
+Service name
+Namespace
+DNS configuration
+
+13. High CPU Usage ⭐⭐⭐⭐
+
+Interviewer
+"Pods are slow."
+
+Check
+kubectl top pod
+kubectl top node
+
+Solution
+Scale Pods (Horizontal Pod Autoscaler).
+Increase CPU requests/limits.
+Optimize the application.
+
+
+14. Worker Node Disk Full ⭐⭐⭐
+
+Symptoms
+Pods Evicted
+Node Not Ready
+
+Check
+df -h
+
+Clean
+Old container images
+Logs
+Unused volumes
+
+
+15. Cluster Upgrade Failure ⭐⭐⭐
+
+Interviewer
+"Upgrade failed."
+
+Answer
+Upgrade control plane first.
+Upgrade worker nodes.
+Drain nodes before upgrading.
+Uncordon nodes after completion.
+Verify workloads after each step.
+
+Commands
+kubectl drain node1
+kubectl uncordon node1
+Real Interview Scenario (Most Common)
+
+
+Interviewer:
+
+"Your application is down. Walk me through your troubleshooting process."
+
+A strong answer would be:
+
+1. kubectl get pods
+        │
+        ▼
+2. Check Pod Status
+        │
+        ▼
+3. kubectl describe pod
+        │
+        ▼
+4. kubectl logs
+        │
+        ▼
+5. kubectl get events
+        │
+        ▼
+6. kubectl get svc
+        │
+        ▼
+7. kubectl get ingress
+        │
+        ▼
+8. kubectl get nodes
+        │
+        ▼
+9. Check CPU/Memory
+        │
+        ▼
+10. Rollback if required
+
+
+
+Interview Tip
+
+Interviewers usually don't expect you to memorize every error message. They want to see a logical troubleshooting process:
+
+Identify the failing component (Pod, Service, Node, Ingress, Storage).
+Gather evidence using kubectl get, describe, logs, and events.
+Find the root cause (application, configuration, networking, storage, or resources).
+Resolve the issue and verify that the application is healthy again
