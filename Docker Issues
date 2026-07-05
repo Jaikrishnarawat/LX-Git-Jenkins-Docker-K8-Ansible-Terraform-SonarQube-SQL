@@ -1,0 +1,296 @@
+1. Docker Container Keeps Restarting ⭐⭐⭐⭐⭐
+Interviewer:
+
+"Your Docker container is restarting continuously. How do you troubleshoot?"
+
+Possible Causes
+Application crash
+Missing environment variables
+Wrong startup command
+Database connection failure
+
+Commands
+docker ps -a
+docker logs <container-id>
+docker inspect <container-id>
+
+Example
+Exited (1)
+
+Restarting...
+Sample Answer
+
+I first check the container logs using docker logs to identify the application error. Then I verify the Dockerfile, startup command, environment variables, mounted volumes, and database connectivity.
+
+
+2. Container Exits Immediately ⭐⭐⭐⭐⭐
+Interviewer
+"Container starts and exits immediately."
+
+Reason
+Main process completed.
+
+Example
+CMD ["echo","Hello"]
+
+Output
+Hello
+Container Exited
+Because Docker expects one foreground process.
+
+Fix
+Run the actual application.
+
+
+3. Unable to Pull Image ⭐⭐⭐⭐⭐
+Interviewer
+"Docker cannot pull image."
+
+Possible reasons
+Wrong image name
+Wrong tag
+Network issue
+Docker Hub authentication failure
+Private registry authentication
+
+Command
+docker pull nginx:latest
+
+If it fails
+manifest unknown
+access denied
+
+
+4. Port Already Allocated ⭐⭐⭐⭐⭐
+
+Example
+docker run -p 80:80 nginx
+
+Error
+Bind for 0.0.0.0:80 failed
+
+Reason
+Another process already uses port 80.
+
+Check
+netstat -tulnp
+docker ps
+
+
+5. No Space Left on Device ⭐⭐⭐⭐⭐
+
+Interviewer
+"Docker suddenly stopped working."
+
+Error
+No space left on device
+
+Check
+docker system df
+
+Cleanup
+docker system prune
+docker image prune
+docker volume prune
+
+
+6. Container Cannot Connect to Database ⭐⭐⭐⭐⭐
+
+Example
+Application
+
+↓
+
+MySQL
+Application says
+Connection Refused
+Possible reasons
+
+Wrong hostname
+Database not started
+Wrong Docker network
+Firewall
+
+Check
+docker network ls
+docker inspect
+
+
+7. Volume Mount Failure ⭐⭐⭐⭐
+
+Interviewer
+"Data is lost after container restart."
+
+Reason
+No volume attached.
+
+Wrong
+docker run nginx
+
+Correct
+docker run -v mydata:/var/lib/mysql mysql
+
+
+8. Environment Variable Missing ⭐⭐⭐⭐
+
+Application expects
+DB_PASSWORD
+
+Run
+docker run myapp
+Container crashes.
+
+Correct
+docker run -e DB_PASSWORD=password
+
+
+9. Docker Daemon Not Running ⭐⭐⭐⭐⭐
+
+Command
+docker ps
+
+Output
+Cannot connect to Docker daemon
+
+Fix
+Linux
+systemctl status docker
+systemctl start docker
+
+
+10. Permission Denied ⭐⭐⭐⭐
+
+Error
+permission denied while trying to connect
+
+Reason
+User isn't in the docker group.
+
+Fix
+sudo usermod -aG docker username
+
+
+11. Image Size Too Large ⭐⭐⭐⭐
+
+Interviewer
+"Your Docker image is 2GB. How do you reduce it?"
+
+Answer
+Multi-stage builds
+Alpine base image
+Remove unnecessary packages
+Combine RUN commands
+Clean package cache
+12. Health Check Failure ⭐⭐⭐⭐
+
+Container
+Running
+Health
+Unhealthy
+Check
+docker inspect
+Review
+HEALTHCHECK
+
+
+13. Network Communication Failure ⭐⭐⭐⭐
+
+Two containers
+Frontend
+
+↓
+
+Backend
+
+Cannot communicate.
+
+Check
+docker network ls
+docker network inspect
+
+
+14. Wrong Dockerfile ⭐⭐⭐⭐
+
+Interviewer
+"Build succeeds but application doesn't work."
+
+Common mistakes
+COPY wrong/path
+
+or
+
+WORKDIR incorrect
+Debug
+docker history
+docker inspect
+
+
+15. Build Failure ⭐⭐⭐⭐⭐
+
+Example
+docker build .
+
+Fails
+COPY failed
+No such file
+
+Reasons
+Wrong path
+Missing file
+.dockerignore excludes required files
+Real Production Interview Scenario
+
+
+
+Interviewer:
+
+"After deploying a new Docker image, the application is down. How do you troubleshoot?"
+
+Good Answer
+1. docker ps -a
+        │
+        ▼
+2. Check Container Status
+        │
+        ▼
+3. docker logs <container>
+        │
+        ▼
+4. docker inspect <container>
+        │
+        ▼
+5. Check Environment Variables
+        │
+        ▼
+6. Check Mounted Volumes
+        │
+        ▼
+7. Check Docker Network
+        │
+        ▼
+8. Check Port Mapping
+        │
+        ▼
+9. Verify Image Version
+        │
+        ▼
+10. Rollback to Previous Image if Needed
+
+
+
+Question: "A Docker container is restarting continuously. What will you do?"
+
+Answer:
+First, I check the container status using docker ps -a to confirm whether it's restarting or exiting. Then I inspect the logs with docker logs <container-id> to identify the root cause. If the logs indicate an application error, I verify environment variables, configuration files, database connectivity, mounted volumes, and the startup command. If the issue is related to the image, I compare it with the previous working version or roll back to the earlier image. Finally, I confirm that the container is healthy and functioning correctly after applying the fix.
+
+
+
+💡 Interview Tip
+
+For experienced DevOps interviews, avoid answering with only commands. Structure your response like this:
+
+Identify the symptom (e.g., container restarting, image pull failure).
+Collect evidence (docker ps, docker logs, docker inspect).
+Determine the root cause (application, configuration, networking, storage, or Docker daemon).
+Implement the fix.
+Validate that the container is healthy and the application works as expected.
